@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Auth\User;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlagsProvider;
+use FriendsOfCat\LaravelFeatureFlags\ExampleFeatureProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -12,7 +13,8 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         return
             [
-            FeatureFlagsProvider::class,
+                ExampleFeatureProvider::class,
+                FeatureFlagsProvider::class,
             ];
     }
 

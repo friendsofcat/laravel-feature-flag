@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlagUser;
 use Ramsey\Uuid\Uuid;
+use FriendsOfCat\LaravelFeatureFlags\AddExampleFeaturesTableSeeder;
 
 class FeatureFlagTest extends TestCase
 {
@@ -129,6 +130,10 @@ class FeatureFlagTest extends TestCase
 
         $this->be($this->user);
 
+        $calss = new AddExampleFeaturesTableSeeder();
+        $calss->run();
+
+
         $feature = factory(\FriendsOfCat\LaravelFeatureFlags\FeatureFlag::class)->create(
             [
                 'key' => 'testing',
@@ -139,15 +144,6 @@ class FeatureFlagTest extends TestCase
         $this->registerFeatureFlags();
 
         $this->get('/example')->assertSeeText("Testing Off");
-
-
-        //$feature->variants = "on";
-
-        //$feature->save();
-
-        //$this->registerFeatureFlags();
-
-        //$this->get('/example')->assertDontSeeText("Testing Off")->assertSeeText("Testing On");
     }
 
 
@@ -185,6 +181,16 @@ class FeatureFlagTest extends TestCase
         );
 
         $this->registerFeatureFlags();
+
+        $this->get('/example')->assertSeeText("Testing Off");
+    }
+
+
+    public function testForNotFindFeature()
+    {
+        $this->user = factory(FeatureFlagUser::class)->create(['email' => 'foo4@gmail.com']);
+
+        $this->be($this->user);
 
         $this->get('/example')->assertSeeText("Testing Off");
     }

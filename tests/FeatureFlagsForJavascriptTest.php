@@ -10,22 +10,33 @@ namespace Tests;
 
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlag;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlagsForJavascript;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\App;
 
 class FeatureFlagsForJavascriptTest extends TestCase
 {
+    use DatabaseMigrations;
+
+    public function testGetNoResults()
+    {
+        $fjs = new FeatureFlagsForJavascript();
+        $result = $fjs->get();
+        $this->assertEmpty($result);
+    }
+
 
     public function testGetWithResults()
     {
 
-        $this->markTestSkipped("Left off here...");
-        $mock = \Mockery::mock(FeatureFlag::class);
-        $mock->shouldReceive('all')->once();
-
-        App::instance(FeatureFlag::class, $mock);
+        factory(\FriendsOfCat\LaravelFeatureFlags\FeatureFlag::class)->create(
+            [
+                'key' => 'testing',
+                'variants' => '{ "users": [ "foo@gmail.com", "foo2@gmail.com", "foo3@gmail.com" ] }'
+            ]
+        );
 
         $fjs = new FeatureFlagsForJavascript();
-
-        $this->assertEmpty($fjs->get());
+        $result = $fjs->get();
+        $this->assertNotEmpty($result);
     }
 }

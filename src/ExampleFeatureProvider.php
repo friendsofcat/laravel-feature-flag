@@ -35,7 +35,7 @@ class ExampleFeatureProvider extends ServiceProvider
     private function registerRoutes()
     {
         if (! $this->app->routesAreCached()) {
-            require __DIR__ . '/routes.example.php';
+            require __DIR__ . '/../routes.example.php';
         }
     }
 

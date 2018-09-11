@@ -23,7 +23,7 @@ class FeatureFlagSettingsController extends Controller
         }
     }
 
-    public function create(Request $request)
+    public function create()
     {
         $flag = new FeatureFlag();
 
@@ -57,10 +57,6 @@ class FeatureFlagSettingsController extends Controller
         }
     }
 
-    public function show($id)
-    {
-        //
-    }
 
     public function edit($id)
     {
@@ -77,7 +73,6 @@ class FeatureFlagSettingsController extends Controller
     {
         try {
             $flag = FeatureFlag::findOrFail($id);
-
             $flag->variants = ($request->input('variants')) ? json_decode($request->input('variants'), true) : null;
             $flag->save();
 
@@ -98,7 +93,7 @@ class FeatureFlagSettingsController extends Controller
 
             return redirect()->route(
                 'laravel-feature-flag.index'
-            )->withMessage(sprintf("Feature Flag Updated %d", $id));
+            )->withMessage(sprintf("Feature Flag deleted %d", $id));
         } catch (\Exception $e) {
             return redirect()->route('laravel-feature-flag.index')
                 ->withMessage("Could not find feature flag");
