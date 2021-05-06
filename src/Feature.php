@@ -2,10 +2,10 @@
 
 namespace FriendsOfCat\LaravelFeatureFlags;
 
+use FriendsOfCat\LaravelFeatureFlags\FeatureFlagsEnabler;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use FriendsOfCat\LaravelFeatureFlags\FeatureFlagsEnabler;
 
 class Feature
 {
@@ -24,12 +24,12 @@ class Feature
     }
 
     /**
-    * Check if a feature flag exists.
-    *
-    * @param string $featureKey
-    * @param mixed $variant (optional)
-    * @return bool
-    */
+     * Check if a feature flag exists.
+     *
+     * @param string $featureKey
+     * @param mixed $variant (optional)
+     * @return bool
+     */
     public function exists($featureKey)
     {
         return isset($this->instance[$featureKey]);
@@ -62,17 +62,19 @@ class Feature
      */
     public function getConfig($featureKey)
     {
-        if (isset($this->instance[$featureKey])) {
+        if (array_key_exists($featureKey, $this->instance)) {
             return $this->instance[$featureKey];
         }
 
-        $featureFlag = FeatureFlag::where('key', $featureKey)->first();
+        $featureFlag = once(function () use ($featureKey) {
+            return FeatureFlag::where('key', $featureKey)->first();
+        });
 
-        if (isset($featureFlag)) {
-            return  $featureFlag->variants;
+        if ($featureFlag === null) {
+            return self::OFF;
         }
 
-        return self::OFF;
+        return $featureFlag->variants;
     }
 
     /**

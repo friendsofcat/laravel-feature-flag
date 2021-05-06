@@ -2,11 +2,13 @@
 
 namespace Tests;
 
+use FriendsOfCat\LaravelFeatureFlags\Feature;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlag;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlagHelper;
-use Illuminate\Contracts\Auth\Access\Gate;
 use FriendsOfCat\LaravelFeatureFlags\FeatureFlagUser;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 class FeatureFlagTest extends TestCase
 {
@@ -155,5 +157,24 @@ class FeatureFlagTest extends TestCase
         $this->registerFeatureFlags();
 
         $this->assertFalse($this->app->get(Gate::class)->allows('feature-flag', 'testing'));
+    }
+
+    public function testDatabaseIsOnlyQueriedOnceForEachKey(): void
+    {
+        factory(FeatureFlag::class)->create(['key' => 'Feature One']);
+        factory(FeatureFlag::class)->create(['key' => 'Feature Two']);
+
+        $feature = $this->app->make(Feature::class);
+
+        DB::enableQueryLog();
+
+        $feature->isEnabled('feature_one');
+        $feature->isEnabled('feature_one');
+        $feature->isEnabled('feature_one');
+        $feature->isEnabled('feature_two');
+
+        $queries = DB::getQueryLog();
+
+        $this->assertCount(2, $queries);
     }
 }
